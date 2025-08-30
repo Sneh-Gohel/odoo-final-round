@@ -82,11 +82,6 @@ export const registerNewUser = async (userData: any) => {
     }
 };
 
-// --- NEW LOGIN FUNCTIONALITY ---
-/**
- * Authenticates a user and returns their data along with a JWT.
- * @param loginData Contains email, password, and role from the request.
- */
 export const loginUser = async (loginData: any) => {
     const { email, password, role } = loginData;
 

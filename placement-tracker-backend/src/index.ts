@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import api from './api';
 import { checkDbConnection } from './config/db'; 
+import path from 'path';
 
 // Load environment variables
 dotenv.config();
@@ -12,6 +13,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Main API router
 app.use('/api', api);
