@@ -5,12 +5,14 @@ import CompanyReg from "./company/CompanyReg.jsx";
 import Login from "./Login.jsx";
 function App() {
   return (
+
     <Router>
       <Routes>
         <Route path="/student/register" element={<StudentReg />} />
         <Route path="/login" element={<Login />} />
         <Route path="/company/register" element={<CompanyReg />} /> 
         <Route path="/tpo/register" element={<TpoReg />} />
+        {/* <Route path="/student/dashboard" element={<StudentDashboard />} /> */}
       </Routes>
     </Router>
   );
