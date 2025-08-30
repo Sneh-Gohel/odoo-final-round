@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 import { getDashboardData } from '../controllers/student.controller';
+import { protect, isStudent } from '../middlewares/auth.middleware'
 
 const router = Router();
 
-// --- Joi Validation Schema ---
 const dashboardSchema = Joi.object({
     studentId: Joi.number().integer().required()
 });
@@ -19,6 +19,6 @@ const validateRequest = (schema: Joi.ObjectSchema) => {
     };
 };
 
-router.post('/dashboard', validateRequest(dashboardSchema), getDashboardData);
+router.post('/dashboard', validateRequest(dashboardSchema), getDashboardData, isStudent, getDashboardData);
 
 export default router;

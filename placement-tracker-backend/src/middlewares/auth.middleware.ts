@@ -1,0 +1,49 @@
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+
+// This extends the default Request type to include our user property
+interface AuthRequest extends Request {
+    user?: any;
+}
+
+export const protect = (req: AuthRequest, res: Response, next: NextFunction) => {
+    let token;
+
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+            // Get token from header (e.g., "Bearer eyJhbGci...")
+            token = req.headers.authorization.split(' ')[1];
+
+            // Verify the token and decode its payload
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_default_secret_key');
+
+            // Attach the payload (which contains userId, role, etc.) to the request object
+            req.user = decoded;
+
+            next(); // If token is valid, proceed
+        } catch (error) {
+            return res.status(401).json({ message: 'Not authorized, token failed.' });
+        }
+    }
+
+    if (!token) {
+        return res.status(401).json({ message: 'Not authorized, no token provided.' });
+    }
+};
+
+// A second middleware to check for a specific role
+export const isStudent = (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (req.user && req.user.role === 'STUDENT') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Access forbidden: Students only.' });
+    }
+};
+
+export const isCompany = (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (req.user && req.user.role === 'COMPANY') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Access forbidden: Companies only.' });
+    }
+};
