@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 import { addJobController } from '../controllers/job.controller';
 import { protect, isCompany } from '../middlewares/auth.middleware';
+import { getCompanyDashboardController } from '../controllers/company.controller';
 
 const router = Router();
 
@@ -28,7 +29,8 @@ const validateRequest = (schema: Joi.ObjectSchema) => {
     };
 };
 
-// Route to add a job. It's protected by 'protect' and 'isCompany' middleware.
+
 router.post('/jobs/add', protect, isCompany, validateRequest(jobSchema), addJobController);
+router.get('/dashboard', protect, isCompany, getCompanyDashboardController);
 
 export default router;

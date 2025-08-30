@@ -12,7 +12,7 @@ import { protect, isStudent } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// --- Multer Configuration (Unchanged) ---
+// --- Multer Configuration ---
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/resumes/');

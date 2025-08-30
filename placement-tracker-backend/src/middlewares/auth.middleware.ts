@@ -47,3 +47,12 @@ export const isCompany = (req: AuthRequest, res: Response, next: NextFunction) =
         res.status(403).json({ message: 'Access forbidden: Companies only.' });
     }
 };
+
+export const isTpoOrCompany = (req: AuthRequest, res: Response, next: NextFunction) => {
+    const userRole = req.user?.role;
+    if (userRole && (userRole === 'TPO' || userRole === 'COMPANY')) {
+        next();
+    } else {
+        res.status(403).json({ message: 'Access forbidden: Admins only.' });
+    }
+};
