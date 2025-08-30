@@ -38,3 +38,19 @@ export const updateResumeUrl = async (studentId: number, resumeUrl: string) => {
         throw new Error('Database error while updating resume URL.');
     }
 };
+
+export const getStudentProfile = async (userId: number) => {
+    // This query finds the student profile linked to their login ID.
+    const query = 'SELECT * FROM student_profiles WHERE user_id = ?';
+    try {
+        const [profiles]: any = await db.execute(query, [userId]);
+        if (profiles.length === 0) {
+            throw new Error('Student profile not found for this user.');
+        }
+        // Return the first (and only) profile found.
+        return profiles[0];
+    } catch (error) {
+        console.error("Error fetching student profile:", error);
+        throw error; // Re-throw the error to be handled by the controller
+    }
+};

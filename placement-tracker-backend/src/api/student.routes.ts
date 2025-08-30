@@ -1,18 +1,15 @@
-// File Path: src/api/student.routes.ts (MODIFIED)
+
 
 import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 
-// 1. IMPORT THE CORRECT CONTROLLER FOR JOBS
 import { getJobsController } from '../controllers/job.controller'; 
-// 2. IMPORT THE STUDENT-SPECIFIC CONTROLLERS
-import { getDashboardData, uploadResumeController } from '../controllers/student.controller';
+import { getDashboardData, getStudentProfileController, uploadResumeController } from '../controllers/student.controller';
 import { protect, isStudent } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// --- Multer Configuration ---
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/resumes/');
@@ -37,11 +34,11 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 router.get('/dashboard', protect, isStudent, getDashboardData);
 
-router.post('/resume/upload', protect, isStudent, upload.single('resumeFile'), uploadResumeController);
 
-// --- 3. THE FIX: USE THE CORRECT CONTROLLER NAME ---
-// This route now correctly uses the universal 'getJobsController'.
-// Since it is protected by 'isStudent', only students can access it here.
+router.post('/resume/upload', protect, isStudent, upload.single('resume'), uploadResumeController);
+
 router.get('/jobs', protect, isStudent, getJobsController);
+
+router.get('/profile', protect, isStudent, getStudentProfileController);
 
 export default router;
