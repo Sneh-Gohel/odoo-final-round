@@ -3,7 +3,9 @@
 import bcrypt from 'bcryptjs';
 import db from '../config/db';
 import { PoolConnection } from 'mysql2/promise';
+import jwt from 'jsonwebtoken';
 
+// --- YOUR EXISTING CODE (UNCHANGED) ---
 export const registerNewUser = async (userData: any) => {
     const connection: PoolConnection = await db.getConnection();
     await connection.beginTransaction();
@@ -15,7 +17,7 @@ export const registerNewUser = async (userData: any) => {
         const userQuery = 'INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)';
         const [userResult]: any = await connection.execute(userQuery, [userData.email, hashedPassword, userData.role]);
         const userId = userResult.insertId;
-
+        
         switch (userData.role) {
             case 'STUDENT':
                 const studentQuery = `
@@ -31,12 +33,11 @@ export const registerNewUser = async (userData: any) => {
                     userData.currentYear,
                     userData.cgpa,
                     userData.active_backlogs,
-                    userData.skills || null // Safeguard: Pass null if skills is missing
+                    userData.skills || null
                 ]);
                 break;
 
             case 'COMPANY':
-                // --- CORRECTED QUERY AND PARAMETERS ---
                 const companyQuery = `
                     INSERT INTO company_profiles 
                     (user_id, company_name, website_url, description, email, hr_contact,contact) 
@@ -53,7 +54,7 @@ export const registerNewUser = async (userData: any) => {
                 break;
             
             case 'TPO':
-                 const tpoQuery = `
+                const tpoQuery = `
                     INSERT INTO tpo_profiles 
                     (user_id, full_name, institute_name, contact_phone) 
                     VALUES (?, ?, ?, ?)`;
@@ -61,7 +62,7 @@ export const registerNewUser = async (userData: any) => {
                     userId,
                     userData.fullName,
                     userData.instituteName,
-                    userData.contactPhone // Using the standardized name
+                    userData.contactPhone
                 ]);
                 break;
 
@@ -79,4 +80,71 @@ export const registerNewUser = async (userData: any) => {
     } finally {
         connection.release();
     }
+};
+
+// --- NEW LOGIN FUNCTIONALITY ---
+/**
+ * Authenticates a user and returns their data along with a JWT.
+ * @param loginData Contains email, password, and role from the request.
+ */
+export const loginUser = async (loginData: any) => {
+    const { email, password, role } = loginData;
+
+    // Step 1: Find the user by their email
+    const userQuery = 'SELECT * FROM users WHERE email = ?';
+    const [users]: any = await db.execute(userQuery, [email]);
+
+    if (users.length === 0) {
+        throw new Error('Authentication failed'); // Generic error
+    }
+    const user = users[0];
+
+    // Step 2: Check if the role matches
+    if (user.role !== role) {
+        throw new Error('Authentication failed'); // Generic error
+    }
+
+    // Step 3: Compare the provided password with the stored hash
+    const isPasswordMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isPasswordMatch) {
+        throw new Error('Authentication failed'); // Generic error
+    }
+
+    // Step 4: Fetch the user's detailed profile
+    const profileTableMap: { [key: string]: string } = {
+        STUDENT: 'student_profiles',
+        COMPANY: 'company_profiles',
+        TPO: 'tpo_profiles',
+    };
+    const tableName = profileTableMap[user.role];
+    const profileQuery = `SELECT * FROM ${tableName} WHERE user_id = ?`;
+    const [profiles]: any = await db.execute(profileQuery, [user.id]);
+    
+    if (profiles.length === 0) {
+        // This case is unlikely if registration is transactional, but it's a good safeguard.
+        throw new Error('User profile data is missing.');
+    }
+    const userProfile = profiles[0];
+
+    // Step 5: Create the JWT payload
+    const payload = {
+        userId: user.id,
+        role: user.role,
+        email: user.email,
+    };
+
+    const jwtSecret = process.env.JWT_SECRET || 'your_default_secret_key';
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: '1d' });
+
+    // Step 6: Return the final data structure
+    return {
+        message: 'Login successful!',
+        token,
+        user: {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            profile: userProfile,
+        },
+    };
 };

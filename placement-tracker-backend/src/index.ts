@@ -18,7 +18,7 @@ app.use('/api', api);
 
 // Health check route
 app.get('/', (req: Request, res: Response) => {
-    res.send('Placement Tracker API is running... 🚀');
+    res.send('Placement Tracker API is running... ');
 });
 
 // Start the server
