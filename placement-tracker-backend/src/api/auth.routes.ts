@@ -38,7 +38,7 @@ const loginSchema = Joi.object({
     role: Joi.string().valid('STUDENT', 'COMPANY', 'TPO').required()
 });
 
-// --- VALIDATION MIDDLEWARE (UNCHANGED) ---
+// --- VALIDATION MIDDLEWARE ---
 const validateRequest = (schema: Joi.ObjectSchema) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const { error } = schema.validate(req.body, { abortEarly: false });
@@ -52,7 +52,6 @@ const validateRequest = (schema: Joi.ObjectSchema) => {
 
 // --- ROUTES ---
 router.post('/register', validateRequest(registerSchema), registerController);
-// --- NEW LOGIN ROUTE ---
 router.post('/login', validateRequest(loginSchema), loginController);
 
 export default router;

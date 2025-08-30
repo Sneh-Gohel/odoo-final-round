@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createJob } from '../services/job.service';
+import { createJob, getJobsForUser } from '../services/job.service';
 import db from '../config/db';
 
 interface AuthRequest extends Request {
@@ -33,6 +33,23 @@ export const addJobController = async (req: AuthRequest, res: Response) => {
 
     } catch (error: any) {
         console.error("Add Job Controller Error:", error);
+        res.status(500).json({ message: 'An internal server error occurred.' });
+    }
+};
+
+export const getJobsController = async (req: AuthRequest, res: Response) => {
+    try {
+        const userPayload = req.user;
+
+        if (!userPayload) {
+            return res.status(401).json({ message: 'Not authorized.' });
+        }
+
+        const jobs = await getJobsForUser(userPayload);
+        res.status(200).json(jobs);
+
+    } catch (error: any) {
+        console.error("Get Jobs Controller Error:", error);
         res.status(500).json({ message: 'An internal server error occurred.' });
     }
 };
