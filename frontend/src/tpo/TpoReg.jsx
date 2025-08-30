@@ -1,8 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Ip from "../Ip.jsx";
 
 function TpoReg() {
   const navigate = useNavigate();
+
+  // Auto redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+    const savedRole = localStorage.getItem("role");
+    if (token && savedRole) {
+      navigate(`/${savedRole.toLowerCase()}/dashboard`);
+    }
+  }, [navigate]);
 
   const [formData, setFormData] = useState({
     role: "TPO",
@@ -41,7 +51,7 @@ function TpoReg() {
     };
 
     try {
-      const res = await fetch("http://192.168.137.97:3000/api/auth/register", {
+      const res = await fetch(Ip("3000/api/auth/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -88,6 +98,7 @@ function TpoReg() {
 
         <div className="col-md-6">
           <form onSubmit={handleSubmit}>
+            {/* Role selector */}
             <div className="mb-3">
               <select
                 className="form-select custom-input"
@@ -101,6 +112,7 @@ function TpoReg() {
               </select>
             </div>
 
+            {/* Full Name */}
             <div className="mb-3">
               <input
                 type="text"
@@ -112,6 +124,7 @@ function TpoReg() {
               />
             </div>
 
+            {/* Email */}
             <div className="mb-3">
               <input
                 type="email"
@@ -123,6 +136,7 @@ function TpoReg() {
               />
             </div>
 
+            {/* Password */}
             <div className="mb-3">
               <input
                 type="password"
@@ -134,6 +148,7 @@ function TpoReg() {
               />
             </div>
 
+            {/* Confirm Password */}
             <div className="mb-3">
               <input
                 type="password"
@@ -145,6 +160,7 @@ function TpoReg() {
               />
             </div>
 
+            {/* Institute */}
             <div className="mb-3">
               <input
                 type="text"
@@ -156,6 +172,7 @@ function TpoReg() {
               />
             </div>
 
+            {/* Contact Number */}
             <div className="mb-3">
               <input
                 type="text"
@@ -167,6 +184,7 @@ function TpoReg() {
               />
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               className="btn btn-primary custom-btn w-100"
@@ -187,4 +205,5 @@ function TpoReg() {
     </div>
   );
 }
+
 export default TpoReg;

@@ -1,9 +1,19 @@
 import "./StudentReg.css"; // custom css for exact palette
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Ip from "../Ip.jsx";
 
 function StudentReg() {
   const navigate = useNavigate();
+
+  // Auto redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+    const savedRole = localStorage.getItem("role");
+    if (token && savedRole) {
+      navigate(`/${savedRole.toLowerCase()}/dashboard`);
+    }
+  }, [navigate]);
 
   // form state
   const [formData, setFormData] = useState({
@@ -60,7 +70,7 @@ function StudentReg() {
     };
 
     try {
-      const res = await fetch("http://192.168.137.97:3000/api/auth/register", {
+      const res = await fetch(Ip("3000/api/auth/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -286,5 +296,4 @@ function StudentReg() {
     </div>
   );
 }
-
 export default StudentReg;

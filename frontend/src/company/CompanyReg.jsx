@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import Ip from "../Ip.jsx";
 
 function CompanyReg() {
   const navigate = useNavigate();
@@ -17,6 +18,15 @@ function CompanyReg() {
   });
 
   const [loading, setLoading] = useState(false);
+
+  // Auto-redirect if user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+    const savedRole = localStorage.getItem("role");
+    if (token && savedRole) {
+      navigate(`/${savedRole.toLowerCase()}/dashboard`);
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -45,9 +55,8 @@ function CompanyReg() {
       websiteUrl: formData.website
     };
 
-
     try {
-      const res = await fetch("http://192.168.137.97:3000/api/auth/register", {
+      const res = await fetch(Ip("3000/api/auth/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -70,7 +79,6 @@ function CompanyReg() {
 
   return (
     <div className="student-reg-container d-flex flex-column justify-content-center align-items-center">
-      {/* Loader */}
       {loading && (
         <div className="loader-overlay">
           <div className="spinner"></div>

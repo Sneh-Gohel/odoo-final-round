@@ -7,16 +7,21 @@ function StudentNav() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    // Clear any auth tokens / session storage if needed
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+  // Clear JWT token, role, and user info from localStorage
+  localStorage.removeItem("jwtToken");
+  localStorage.removeItem("role");
+  localStorage.removeItem("user");
+
+  // Redirect to login page
+  navigate("/login");
+};
+
 
   const navLinks = [
-    { name: "Dashboard", path: "/student/dashboard" },
-    { name: "Profile", path: "/student/profile" },
-    { name: "Placements", path: "/student/placements" },
-    { name: "Events", path: "/student/events" },
+    { name: "Jobs", path: "/student/dashboard/job" },
+    { name: "Resume Builder", path: "/student/dashboard/resume" },
+    { name: "Leader Board", path: "/student/dashboard/leaderboard" },
+    { name: "Profile", path: "/student/dashboard/profile" },
   ];
 
   return (
