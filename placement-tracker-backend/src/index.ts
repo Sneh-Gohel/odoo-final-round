@@ -1,8 +1,8 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import api from './api'; // Correctly imports src/api/index.ts
-import { checkDbConnection } from './config/db'; // Import the check function
+import api from './api';
+import { checkDbConnection } from './config/db'; 
 
 // Load environment variables
 dotenv.config();

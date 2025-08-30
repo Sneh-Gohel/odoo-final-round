@@ -1,10 +1,49 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
+import Joi from 'joi';
+import { registerController } from '../controllers/auth.controller';
 
 const router = Router();
 
+const registerSchema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required().messages({
+        'string.min': 'Password must be at least 6 characters long.'
+    }),
+    role: Joi.string().valid('STUDENT', 'COMPANY', 'TPO').required(),
 
-router.get('/', (req, res) => {
-    res.send('Auth routes are working.');
+    // --- Student Fields ---
+    fullName: Joi.when('role', { is: 'STUDENT', then: Joi.string().required() }),
+    enrollmentNo: Joi.when('role', { is: 'STUDENT', then: Joi.string().required() }),
+    instituteName: Joi.when('role', { is: ['STUDENT', 'TPO'], then: Joi.string().required() }),
+    branch: Joi.when('role', { is: 'STUDENT', then: Joi.string().required() }), 
+    currentYear: Joi.when('role', { is: 'STUDENT', then: Joi.number().integer().min(1).max(5).required() }),
+    cgpa: Joi.when('role', { is: 'STUDENT', then: Joi.number().min(0).max(10).required() }),
+    active_backlogs: Joi.when('role', { is: 'STUDENT', then: Joi.number().integer().min(0).required() }),
+    skills: Joi.when('role', { is: 'STUDENT', then: Joi.string().allow('').optional() }),
+
+    // --- Company Fields ---
+    companyName: Joi.when('role', { is: 'COMPANY', then: Joi.string().required() }),
+    website: Joi.when('role', { is: 'COMPANY', then: Joi.string().uri().allow('').optional() }),
+    companyEmail: Joi.when('role', { is: 'COMPANY', then: Joi.string().email().required() }),
+    contact: Joi.when('role', { is: 'COMPANY', then: Joi.string().email().required() }),
+    hrContact: Joi.when('role', { is: 'COMPANY', then: Joi.string().allow('').optional() }),
+    description: Joi.when('role', { is: 'COMPANY', then: Joi.string().allow('').optional() }),
+
+    // --- TPO Fields ---
+    contactNumber: Joi.when('role', { is: 'TPO', then: Joi.string().required() })
 });
+
+const validateRequest = (schema: Joi.ObjectSchema) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const { error } = schema.validate(req.body, { abortEarly: false });
+        if (error) {
+            const errorDetails = error.details.map(d => d.message).join(', ');
+            return res.status(400).json({ message: 'Validation failed', details: errorDetails });
+        }
+        next();
+    };
+};
+
+router.post('/register', validateRequest(registerSchema), registerController);
 
 export default router;
