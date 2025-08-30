@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StudentNav from "../components/StudentNav";
 import Ip from "../Ip.jsx";
+// import Dashboard from "./Dashboard.jsx";
+// import { Route } from "react-router-dom";
 
 function StudentDashboard() {
   const navigate = useNavigate();
@@ -16,15 +18,15 @@ function StudentDashboard() {
     
 
     // Fetch dashboard data
-    fetch(Ip("3000/api/student/dashboard"), {
+    fetch(Ip("3000//api/student/dashboard"), {
       headers: {
         Authorization: `Bearer ${token}`, // Pass JWT token
       },
     })
       .then((res) => res.json())
       .then((data) => {
-        setAppliedJobs(data.appliedJobs || 0);
-        setUpcomingEvents(data.upcomingEvents || 0);
+        setAppliedJobs(data.appliedJobs || 100);
+        setUpcomingEvents(data.upcomingEvents || 100);
         setPlacementStatus(data.placementStatus || "Not Placed");
       })
       .catch((err) => {
@@ -36,7 +38,6 @@ function StudentDashboard() {
     <div>
       {/* Navbar */}
       <StudentNav />
-
       {/* Main Dashboard */}
       <div className="container mt-4">
         <div className="row align-items-center">

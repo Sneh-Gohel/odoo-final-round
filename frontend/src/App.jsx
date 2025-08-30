@@ -5,6 +5,8 @@ import CompanyReg from "./company/CompanyReg.jsx";
 import Login from "./Login.jsx";
 import StudentDashboard from "./student/StudentDashboard.jsx";
 import RedirectToLogin from "./RedirectToLogin.jsx";
+import StudentJob from "./student/StudentJob.jsx";
+import CompanyDashboard from "./company/CompanyDashboard.jsx";
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path="/company/register" element={<CompanyReg />} /> 
         <Route path="/tpo/register" element={<TpoReg />} />
         <Route path="/student/dashboard" element={<StudentDashboard />} />
+        <Route path="/student/dashboard/job" element={<StudentJob />} />
+        <Route path="/company/dashboard" element={<CompanyDashboard />} />
 
         {/* Catch all undefined routes and redirect to login */}
         {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
