@@ -37,7 +37,7 @@ function TpoReg() {
       email: formData.email,
       password: formData.password,
       instituteName: formData.institute,
-      contactNumber: formData.contactNumber,
+      contactPhone: formData.contactNumber,
     };
 
     try {

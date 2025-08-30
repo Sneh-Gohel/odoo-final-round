@@ -3,6 +3,7 @@ import StudentReg from "./student/StudentReg.jsx";
 import TpoReg from "./tpo/TpoReg.jsx";
 import CompanyReg from "./company/CompanyReg.jsx";
 import Login from "./Login.jsx";
+import StudentDashboard from "./student/StudentDashboard.jsx";
 function App() {
   return (
 
@@ -12,7 +13,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/company/register" element={<CompanyReg />} /> 
         <Route path="/tpo/register" element={<TpoReg />} />
-        {/* <Route path="/student/dashboard" element={<StudentDashboard />} /> */}
+        <Route path="/student/dashboard" element={<StudentDashboard />} />
       </Routes>
     </Router>
   );
