@@ -1,3 +1,5 @@
+// File Path: src/services/auth.service.ts
+
 import bcrypt from 'bcryptjs';
 import db from '../config/db';
 import { PoolConnection } from 'mysql2/promise';
@@ -25,22 +27,28 @@ export const registerNewUser = async (userData: any) => {
                     userData.fullName,
                     userData.enrollmentNo,
                     userData.instituteName,
-                    userData.branch, 
+                    userData.branch,
                     userData.currentYear,
                     userData.cgpa,
                     userData.active_backlogs,
-                    userData.skills
+                    userData.skills || null // Safeguard: Pass null if skills is missing
                 ]);
                 break;
 
             case 'COMPANY':
+                // --- CORRECTED QUERY AND PARAMETERS ---
                 const companyQuery = `
                     INSERT INTO company_profiles 
-                    (user_id, company_name, website_url, contact_email, hr_contact_phone) 
-                    VALUES (?, ?, ?, ?, ?)`;
+                    (user_id, company_name, website_url, description, email, hr_contact,contact) 
+                    VALUES (?, ?, ?, ?, ?, ?,?)`;
                 await connection.execute(companyQuery, [
-                    userId, userData.companyName, userData.websiteUrl,
-                    userData.contactEmail, userData.hrContactPhone,userData.description
+                    userId,
+                    userData.companyName,
+                    userData.websiteUrl || null,
+                    userData.description || null, 
+                    userData.contactEmail,
+                    userData.hrContactPhone || null ,
+                    userData.contact || null 
                 ]);
                 break;
             
@@ -50,7 +58,10 @@ export const registerNewUser = async (userData: any) => {
                     (user_id, full_name, institute_name, contact_phone) 
                     VALUES (?, ?, ?, ?)`;
                 await connection.execute(tpoQuery, [
-                    userId, userData.fullName, userData.instituteName, userData.contactNumber
+                    userId,
+                    userData.fullName,
+                    userData.instituteName,
+                    userData.contactPhone // Using the standardized name
                 ]);
                 break;
 

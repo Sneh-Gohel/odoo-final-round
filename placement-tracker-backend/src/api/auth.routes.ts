@@ -1,9 +1,12 @@
+// File Path: src/api/auth.routes.ts
+
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 import { registerController } from '../controllers/auth.controller';
 
 const router = Router();
 
+// --- CORRECTED VALIDATION SCHEMA ---
 const registerSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required().messages({
@@ -12,7 +15,7 @@ const registerSchema = Joi.object({
     role: Joi.string().valid('STUDENT', 'COMPANY', 'TPO').required(),
 
     // --- Student Fields ---
-    fullName: Joi.when('role', { is: 'STUDENT', then: Joi.string().required() }),
+    fullName: Joi.when('role', { is: ['STUDENT', 'TPO'], then: Joi.string().required() }),
     enrollmentNo: Joi.when('role', { is: 'STUDENT', then: Joi.string().required() }),
     instituteName: Joi.when('role', { is: ['STUDENT', 'TPO'], then: Joi.string().required() }),
     branch: Joi.when('role', { is: 'STUDENT', then: Joi.string().required() }), 
@@ -21,16 +24,16 @@ const registerSchema = Joi.object({
     active_backlogs: Joi.when('role', { is: 'STUDENT', then: Joi.number().integer().min(0).required() }),
     skills: Joi.when('role', { is: 'STUDENT', then: Joi.string().allow('').optional() }),
 
-    // --- Company Fields ---
+    // --- Company Fields (Standardized Names) ---
     companyName: Joi.when('role', { is: 'COMPANY', then: Joi.string().required() }),
-    website: Joi.when('role', { is: 'COMPANY', then: Joi.string().uri().allow('').optional() }),
-    companyEmail: Joi.when('role', { is: 'COMPANY', then: Joi.string().email().required() }),
-    contact: Joi.when('role', { is: 'COMPANY', then: Joi.string().email().required() }),
-    hrContact: Joi.when('role', { is: 'COMPANY', then: Joi.string().allow('').optional() }),
+    websiteUrl: Joi.when('role', { is: 'COMPANY', then: Joi.string().uri().allow('').optional() }),
+    contactEmail: Joi.when('role', { is: 'COMPANY', then: Joi.string().email().required() }),
+    hrContactPhone: Joi.when('role', { is: 'COMPANY', then: Joi.string().allow('').optional() }),
+    contact: Joi.when('role', { is: 'COMPANY', then: Joi.string().allow('').optional() }),
     description: Joi.when('role', { is: 'COMPANY', then: Joi.string().allow('').optional() }),
 
-    // --- TPO Fields ---
-    contactNumber: Joi.when('role', { is: 'TPO', then: Joi.string().required() })
+    // --- TPO Fields (Standardized Name) ---
+    contactPhone: Joi.when('role', { is: 'TPO', then: Joi.string().required() })
 });
 
 const validateRequest = (schema: Joi.ObjectSchema) => {
