@@ -54,3 +54,54 @@ export const getStudentProfile = async (userId: number) => {
         throw error; // Re-throw the error to be handled by the controller
     }
 };
+
+export const updateStudentProfile = async (userId: number, profileData: any) => {
+    const {
+        full_name,
+        enrollment_no,
+        institute_name,
+        branch,
+        current_year,
+        cgpa,
+        skills,
+        active_backlogs
+    } = profileData;
+
+    const query = `
+        UPDATE student_profiles 
+        SET 
+            full_name = ?, 
+            enrollment_no = ?, 
+            institute_name = ?, 
+            branch = ?, 
+            current_year = ?, 
+            cgpa = ?, 
+            skills = ?, 
+            active_backlogs = ?
+        WHERE user_id = ?
+    `;
+
+    try {
+        const [result]: any = await db.execute(query, [
+            full_name,
+            enrollment_no,
+            institute_name,
+            branch,
+            current_year,
+            cgpa,
+            skills,
+            active_backlogs,
+            userId
+        ]);
+
+        if (result.affectedRows === 0) {
+            throw new Error('Profile not found for this user, could not update.');
+        }
+
+        return { message: 'Profile updated successfully.' };
+
+    } catch (error) {
+        console.error("Error updating student profile:", error);
+        throw error;
+    }
+};

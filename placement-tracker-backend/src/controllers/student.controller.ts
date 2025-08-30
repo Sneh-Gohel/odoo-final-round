@@ -2,7 +2,7 @@
 
 import { Request, Response } from 'express';
 // Import all necessary service functions
-import { getDashboardStats, getStudentProfile, updateResumeUrl } from '../services/student.service';
+import { getDashboardStats, getStudentProfile, updateResumeUrl, updateStudentProfile } from '../services/student.service';
 // Import the database connection to find the student's profile
 import db from '../config/db';
 
@@ -85,6 +85,26 @@ export const getStudentProfileController = async (req: AuthRequest, res: Respons
             return res.status(404).json({ message: error.message });
         }
         console.error("Get Student Profile Controller Error:", error);
+        res.status(500).json({ message: 'An internal server error occurred.' });
+    }
+};
+
+export const updateStudentProfileController = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Not authorized, user ID missing from token.' });
+        }
+
+        const result = await updateStudentProfile(userId, req.body);
+        res.status(200).json(result);
+
+    } catch (error: any) {
+        if (error.message.includes('not found')) {
+            return res.status(404).json({ message: error.message });
+        }
+        console.error("Update Student Profile Controller Error:", error);
         res.status(500).json({ message: 'An internal server error occurred.' });
     }
 };
