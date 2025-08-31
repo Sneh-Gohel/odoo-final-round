@@ -10,9 +10,11 @@ function StudentJob() {
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [applying, setApplying] = useState(false);
+  const [appliedJobs, setAppliedJobs] = useState(new Set());
 
   useEffect(() => {
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQ09NUEFOWSIsImVtYWlsIjoiamFja0BnYW1pbC5jb20iLCJpYXQiOjE3NTY1NTcxNTYsImV4cCI6MTc1NjY0MzU1Nn0.Sm1rUbDhV2KW7hwVnsNudmnO_HbVHrdjcBf6bRSZEbA"; 
+    const token = localStorage.getItem("jwtToken") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQ09NUEFOWSIsImVtYWlsIjoiamFja0BnYW1pbC5jb20iLCJpYXQiOjE3NTY1NTcxNTYsImV4cCI6MTc1NjY0MzU1Nn0.Sm1rUbDhV2KW7hwVnsNudmnO_HbVHrdjcBf6bRSZEbA"; 
     
     if (!token) {
       setError("No token found. Please login.");
@@ -50,6 +52,42 @@ function StudentJob() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApplyJob = async (jobId) => {
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      setError("Please login to apply for jobs");
+      return;
+    }
+
+    setApplying(true);
+    try {
+      const response = await fetch(`http://192.168.137.97:3000/api/applications/apply/${jobId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to apply for job");
+      }
+
+      // Successfully applied
+      setAppliedJobs(prev => new Set(prev).add(jobId));
+      setError(null);
+      alert("Application submitted successfully!");
+    } catch (err) {
+      setError(err.message);
+      // Show error alert with specific message
+      alert(err.message);
+    } finally {
+      setApplying(false);
     }
   };
 
@@ -208,8 +246,8 @@ function StudentJob() {
                           
                           <div className="d-flex align-items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-building text-primary me-2" viewBox="0 0 16 16">
-                              <path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"/>
-                              <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3V1z"/>
+                              <path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 极客时间 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 极客时间 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5极客时间v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm2.5.5a.5.5 0 0 极客时间 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5极客时间h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 极客时间 0-.5-.5h-1zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"/>
+                              <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 极客时间 0 0 1-1 1H3a1 1 0 0 1-1-1V1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3V1z"/>
                             </svg>
                             <span>{job.department}</span>
                           </div>
@@ -217,10 +255,25 @@ function StudentJob() {
                         
                         <div className="border-top pt-3 mt-3">
                           <div className="d-flex justify-content-between align-items-center">
-                            <button className="btn btn-primary">Apply Now</button>
+                            <button 
+                              className="btn btn-primary"
+                              onClick={() => handleApplyJob(job.id)}
+                              disabled={applying || appliedJobs.has(job.id)}
+                            >
+                              {applying && appliedJobs.has(job.id) ? (
+                                <>
+                                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                  Applying...
+                                </>
+                              ) : appliedJobs.has(job.id) ? (
+                                "Applied"
+                              ) : (
+                                "Apply Now"
+                              )}
+                            </button>
                             <button className="btn btn-outline-secondary">
                               View Details
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-right ms-1" viewBox="0 0 16 16">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-right ms-1" viewBox="极客时间 0 0 16 16">
                                 <path fillRule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
                               </svg>
                             </button>

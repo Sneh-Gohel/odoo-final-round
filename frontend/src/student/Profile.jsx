@@ -411,22 +411,6 @@ function Profile() {
                     </div>
                   </div>
                 </div>
-
-                {/* Display current skills as badges */}
-                {profileData.skills && (
-                  <div className="mt-4">
-                    <h5>Your Skills:</h5>
-                    <div className="d-flex flex-wrap gap-2">
-                      {profileData.skills.split(',').map((skill, index) => (
-                        skill.trim() && (
-                          <span key={index} className="badge bg-primary">
-                            {skill.trim()}
-                          </span>
-                        )
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>

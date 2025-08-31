@@ -9,6 +9,11 @@ import StudentJob from "./student/StudentJob.jsx";
 import CompanyDashboard from "./company/CompanyDashboard.jsx";
 import Resume from "./student/Resume.jsx";
 import Profile from "./student/Profile.jsx";
+import ViewApplicant from "./company/ViewApplicant.jsx";
+import TpoDashboard from "./tpo/TpoDashboard.jsx";
+import TpoCompanies from "./tpo/TpoCompanies.jsx";
+import TpoStudent from "./tpo/TpoStudent.jsx";
+import TpoTest from "./tpo/TpoTest.jsx";
 
 function App() {
   return (
@@ -24,6 +29,11 @@ function App() {
         <Route path="/company/dashboard" element={<CompanyDashboard />} />
         <Route path="/student/dashboard/resume" element={<Resume />} />
         <Route path="/student/dashboard/profile" element={<Profile />} />
+        <Route path="/company/dashboard/viewApplicant" element={<ViewApplicant />} />
+        <Route path="/tpo/dashboard" element={<TpoDashboard />} />
+        <Route path="/tpo/companies" element={<TpoCompanies />} />
+        <Route path="/tpo/students" element={<TpoStudent />} />
+        <Route path="/tpo/test" element={<TpoTest />} />
 
         {/* Catch all undefined routes and redirect to login */}
         {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
