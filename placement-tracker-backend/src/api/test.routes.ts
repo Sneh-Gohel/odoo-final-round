@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { createTestController, addQuestionController, deleteQuestionController, deleteTestController } from '../controllers/test.controller';
+import { createTestController, addQuestionController, deleteQuestionController, deleteTestController, getTestDetailsController } from '../controllers/test.controller';
 import { protect, isTpoOrCompany } from '../middlewares/auth.middleware';
 
 const router = Router();
@@ -52,5 +52,7 @@ router.post('/:testId/questions/add', protect, isTpoOrCompany, validateRequest(a
 router.delete('/questions/:questionId', protect, isTpoOrCompany, deleteQuestionController);
 
 router.delete('/:testId', protect, isTpoOrCompany, deleteTestController);
+
+router.get('/:testId', protect, getTestDetailsController);
 
 export default router;

@@ -1,10 +1,13 @@
+
+
 import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import path from 'path';
-import Joi from 'joi'; // 1. ADDED Joi import
+import Joi from 'joi';
 
 import { getJobsController } from '../controllers/job.controller'; 
-// 2. IMPORT the update controller
+// 1. Import the new controller for submitting tests
+import { submitTestController } from '../controllers/test.controller';
 import { 
     getDashboardData, 
     getStudentProfileController, 
@@ -16,7 +19,7 @@ import { protect, isStudent } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// --- Multer Configuration---
+// --- Multer Configuration ---
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/resumes/');
@@ -26,7 +29,6 @@ const storage = multer.diskStorage({
         cb(null, uniqueName);
     }
 });
-
 const fileFilter = (req: any, file: any, cb: any) => {
     if (file.mimetype === 'application/pdf') {
         cb(null, true);
@@ -34,11 +36,9 @@ const fileFilter = (req: any, file: any, cb: any) => {
         cb(new Error('Only PDF files are allowed!'), false);
     }
 };
-
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 
-
-// --- 3. DEFINED the Joi validation schema for updating a profile ---
+// --- Validation Schemas ---
 const updateProfileSchema = Joi.object({
     full_name: Joi.string().required(),
     enrollment_no: Joi.string().required(),
@@ -50,8 +50,17 @@ const updateProfileSchema = Joi.object({
     active_backlogs: Joi.number().integer().min(0).required()
 });
 
+// 2. DEFINED the missing schema for test submission
+const submitTestSchema = Joi.object({
+    answers: Joi.array().items(
+        Joi.object({
+            questionId: Joi.number().integer().required(),
+            selectedOptionId: Joi.number().integer().required()
+        })
+    ).min(1).required()
+});
 
-// --- 4. IMPLEMENTED the validation middleware correctly ---
+// --- Validation Middleware ---
 const validateRequest = (schema: Joi.ObjectSchema) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const { error } = schema.validate(req.body);
@@ -62,19 +71,16 @@ const validateRequest = (schema: Joi.ObjectSchema) => {
     };
 };
 
-
 // --- ROUTES ---
 
 router.get('/dashboard', protect, isStudent, getDashboardData);
-
 router.post('/resume/upload', protect, isStudent, upload.single('resume'), uploadResumeController);
-
 router.get('/jobs', protect, isStudent, getJobsController);
-
 router.get('/profile', protect, isStudent, getStudentProfileController);
-
 router.put('/profile', protect, isStudent, validateRequest(updateProfileSchema), updateStudentProfileController);
-
 router.get('/history', protect, isStudent, getStudentHistoryController);
+
+// 3. This route is now correct and will work
+router.post('/tests/:testId/submit', protect, isStudent, validateRequest(submitTestSchema), submitTestController);
 
 export default router;

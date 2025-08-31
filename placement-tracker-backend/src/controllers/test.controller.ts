@@ -1,6 +1,6 @@
 
 import { Request, Response } from 'express';
-import { createTestShell, addQuestionToTest, deleteQuestion, deleteTest } from '../services/test.service';
+import { createTestShell, addQuestionToTest, deleteQuestion, deleteTest, getTestForStudent, getTestDetails, submitTestForGrading } from '../services/test.service';
 import db from '../config/db';
 
 interface AuthRequest extends Request {
@@ -65,5 +65,46 @@ export const deleteTestController = async (req: Request, res: Response) => {
             return res.status(404).json({ message: error.message });
         }
         res.status(500).json({ message: error.message });
+    }
+};
+
+export const getTestDetailsController = async (req: Request, res: Response) => {
+    try {
+        const testId = parseInt(req.params.testId, 10);
+        if (isNaN(testId)) {
+            return res.status(400).json({ message: 'Invalid Test ID.' });
+        }
+
+        const testData = await getTestDetails(testId);
+        res.status(200).json(testData);
+
+    } catch (error: any) {
+        if (error.message.includes('not found')) {
+            return res.status(404).json({ message: error.message });
+        }
+        console.error("Get Test Details Controller Error:", error);
+        res.status(500).json({ message: 'An internal server error occurred.' });
+    }
+};
+
+export const submitTestController = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const testId = parseInt(req.params.testId, 10);
+        const { answers } = req.body; // The array of answers from the student
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Not authorized.' });
+        }
+        if (isNaN(testId)) {
+            return res.status(400).json({ message: 'Invalid Test ID.' });
+        }
+
+        const result = await submitTestForGrading(userId, testId, answers);
+        res.status(200).json(result);
+
+    } catch (error: any) {
+        console.error("Submit Test Controller Error:", error);
+        res.status(500).json({ message: error.message || 'An internal server error occurred.' });
     }
 };
