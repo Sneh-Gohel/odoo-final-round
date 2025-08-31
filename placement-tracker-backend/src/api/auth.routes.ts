@@ -4,10 +4,10 @@ import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 // Import both controllers
 import { registerController, loginController } from '../controllers/auth.controller';
+import { sendOtpController } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// --- YOUR EXISTING CODE (UNCHANGED) ---
 const registerSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required().messages({
@@ -31,11 +31,15 @@ const registerSchema = Joi.object({
     contactPhone: Joi.when('role', { is: 'TPO', then: Joi.string().required() })
 });
 
-// --- NEW LOGIN FUNCTIONALITY ---
+
 const loginSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
     role: Joi.string().valid('STUDENT', 'COMPANY', 'TPO').required()
+});
+
+const otpSchema = Joi.object({
+    email: Joi.string().email().required()
 });
 
 // --- VALIDATION MIDDLEWARE ---
@@ -53,5 +57,6 @@ const validateRequest = (schema: Joi.ObjectSchema) => {
 // --- ROUTES ---
 router.post('/register', validateRequest(registerSchema), registerController);
 router.post('/login', validateRequest(loginSchema), loginController);
+router.post('/send-otp', validateRequest(otpSchema), sendOtpController);
 
 export default router;

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { sendVerificationOtp } from '../services/email.service.ts';
 
 // This extends the default Request type to include our user property
 interface AuthRequest extends Request {
@@ -54,5 +55,34 @@ export const isTpoOrCompany = (req: AuthRequest, res: Response, next: NextFuncti
         next();
     } else {
         res.status(403).json({ message: 'Access forbidden: Admins only.' });
+    }
+};
+
+export const sendOtpController = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required.' });
+        }
+
+        const otp = await sendVerificationOtp(email);
+        
+        // Return the OTP in the response for frontend comparison
+        res.status(200).json({
+            message: 'OTP sent successfully to your email.',
+            otp: otp 
+        });
+
+    } catch (error: any) {
+        console.error("Send OTP Controller Error:", error);
+        res.status(500).json({ message: 'Failed to send OTP.' });
+    }
+};
+
+export const isTpo = (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (req.user && req.user.role === 'TPO') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Access forbidden: TPOs only.' });
     }
 };

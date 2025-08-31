@@ -9,13 +9,14 @@ import {
     getDashboardData, 
     getStudentProfileController, 
     uploadResumeController, 
-    updateStudentProfileController 
+    updateStudentProfileController, 
+    getStudentHistoryController
 } from '../controllers/student.controller';
 import { protect, isStudent } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// --- Multer Configuration (Unchanged) ---
+// --- Multer Configuration---
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/resumes/');
@@ -73,5 +74,7 @@ router.get('/jobs', protect, isStudent, getJobsController);
 router.get('/profile', protect, isStudent, getStudentProfileController);
 
 router.put('/profile', protect, isStudent, validateRequest(updateProfileSchema), updateStudentProfileController);
+
+router.get('/history', protect, isStudent, getStudentHistoryController);
 
 export default router;

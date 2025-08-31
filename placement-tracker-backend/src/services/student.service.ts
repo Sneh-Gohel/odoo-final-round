@@ -105,3 +105,46 @@ export const updateStudentProfile = async (userId: number, profileData: any) => 
         throw error;
     }
 };
+
+export const getStudentHistory = async (studentUserId: number) => {
+    // This query uses UNION ALL to combine two sets of data into a single list.
+    const historyQuery = `
+        -- Part 1: Get the initial "Applied" events from the applications table
+        SELECT 
+            j.title AS job_title,
+            c.company_name,
+            a.status AS event_description,
+            a.applied_at AS event_date
+        FROM applications a
+        JOIN jobs j ON a.job_id = j.id
+        JOIN company_profiles c ON j.company_id = c.id
+        JOIN student_profiles sp ON a.student_id = sp.id
+        WHERE sp.user_id = ?
+
+        UNION ALL
+
+        -- Part 2: Get all subsequent status changes from the recruitment_events log
+        SELECT 
+            j.title AS job_title,
+            c.company_name,
+            re.event_type AS event_description,
+            re.created_at AS event_date
+        FROM recruitment_events re
+        JOIN applications a ON re.application_id = a.id
+        JOIN jobs j ON a.job_id = j.id
+        JOIN company_profiles c ON j.company_id = c.id
+        JOIN student_profiles sp ON a.student_id = sp.id
+        WHERE sp.user_id = ?
+
+        -- Finally, order the combined results to create a chronological timeline
+        ORDER BY event_date DESC;
+    `;
+
+    try {
+        const [history] = await db.execute(historyQuery, [studentUserId, studentUserId]);
+        return history;
+    } catch (error) {
+        console.error("Error fetching student history:", error);
+        throw new Error('Database error while fetching activity history.');
+    }
+};

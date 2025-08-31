@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { addJobController } from '../controllers/job.controller';
+import { addJobController, updateJobScheduleController } from '../controllers/job.controller';
 import { protect, isCompany } from '../middlewares/auth.middleware';
 import { getCompanyDashboardController } from '../controllers/company.controller';
 
@@ -29,8 +29,15 @@ const validateRequest = (schema: Joi.ObjectSchema) => {
     };
 };
 
+const scheduleSchema = Joi.object({
+    aptitude_date: Joi.string().allow(null, ''),
+    gd_date: Joi.string().allow(null, ''),
+    interview_date: Joi.string().allow(null, ''),
+    offer_letter: Joi.string().allow(null, '')
+});
 
 router.post('/jobs/add', protect, isCompany, validateRequest(jobSchema), addJobController);
 router.get('/dashboard', protect, isCompany, getCompanyDashboardController);
+router.put('/jobs/:jobId/schedule', protect, isCompany, validateRequest(scheduleSchema), updateJobScheduleController);
 
 export default router;
