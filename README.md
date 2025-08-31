@@ -103,7 +103,7 @@ npm start
 ## Demo
 
 * **GitHub Repository:** [https://github.com/Sneh-Gohel/odoo-final-round.git](https://github.com/Sneh-Gohel/odoo-final-round.git)
-* **Demo Video:** [https://your-video-link.com](https://your-video-link.com)
+* **Demo Video:** [https://drive.google.com/drive/folders/1rOGH_sJ114TMtCH0R_ZN3yC-c0kkZZjo?usp=sharing](https://drive.google.com/drive/folders/1rOGH_sJ114TMtCH0R_ZN3yC-c0kkZZjo?usp=sharing)
 
 ---
 
